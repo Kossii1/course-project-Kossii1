@@ -2,10 +2,10 @@ import os
 from datetime import datetime, timedelta
 from typing import Optional
 
-import jwt
 from dotenv import load_dotenv
+from jose import jwt
 
-load_dotenv()  # подгружает .env (игнорируется Git)
+load_dotenv(".env.example")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
