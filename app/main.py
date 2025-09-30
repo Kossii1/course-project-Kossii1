@@ -2,7 +2,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from app import database, models, schemas, utils
+from app import auth, database, models, schemas, utils
 
 app = FastAPI(title="SecDev Course App", version="0.1.0")
 
@@ -59,3 +59,18 @@ def register(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
     db.commit()
     db.refresh(new_user)
     return {"message": "Registration successful"}
+
+
+@app.post("/auth/login", response_model=schemas.Token)
+def login(credentials: schemas.UserLogin, db: Session = Depends(database.get_db)):
+    user = (
+        db.query(models.User)
+        .filter(models.User.username == credentials.username)
+        .first()
+    )
+    if not user or not utils.verify_password(
+        credentials.password, user.hashed_password
+    ):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    access_token = auth.create_access_token({"sub": str(user.id)})
+    return {"access_token": access_token}
