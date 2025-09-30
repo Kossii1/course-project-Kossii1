@@ -11,5 +11,5 @@ def test_register_login():
     assert r.status_code == 200
 
     # Логин
-    r = client.post("/auth/login", json={"username": "alice", "password": "123"})
+    r = client.post("/auth/login", data={"username": "alice", "password": "123"})
     assert r.status_code == 200
