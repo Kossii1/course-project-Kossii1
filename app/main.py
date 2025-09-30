@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from app import auth, database, models, schemas, utils
+from app import auth, database, dependencies, models, schemas, utils
 
 app = FastAPI(title="SecDev Course App", version="0.1.0")
 
@@ -74,3 +74,92 @@ def login(
         raise HTTPException(status_code=401, detail="Invalid username or password")
     access_token = auth.create_access_token({"sub": str(user.id)})
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+# CREATE
+@app.post("/workouts", response_model=schemas.WorkoutOut)
+def create_workout(
+    workout: schemas.WorkoutCreate,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(dependencies.get_current_user),
+):
+    new_workout = models.Workout(user_id=current_user.id, **workout.dict())
+    db.add(new_workout)
+    db.commit()
+    db.refresh(new_workout)
+    return new_workout
+
+
+# READ ALL
+@app.get("/workouts", response_model=list[schemas.WorkoutOut])
+def get_workouts(
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(dependencies.get_current_user),
+):
+    return (
+        db.query(models.Workout).filter(models.Workout.user_id == current_user.id).all()
+    )
+
+
+# READ ONE
+@app.get("/workouts/{workout_id}", response_model=schemas.WorkoutOut)
+def get_workout(
+    workout_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(dependencies.get_current_user),
+):
+    workout = (
+        db.query(models.Workout)
+        .filter(
+            models.Workout.id == workout_id, models.Workout.user_id == current_user.id
+        )
+        .first()
+    )
+    if not workout:
+        raise HTTPException(status_code=404, detail="Workout not found")
+    return workout
+
+
+# UPDATE
+@app.patch("/workouts/{workout_id}", response_model=schemas.WorkoutOut)
+def update_workout(
+    workout_id: int,
+    workout_update: schemas.WorkoutUpdate,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(dependencies.get_current_user),
+):
+    workout = (
+        db.query(models.Workout)
+        .filter(
+            models.Workout.id == workout_id, models.Workout.user_id == current_user.id
+        )
+        .first()
+    )
+    if not workout:
+        raise HTTPException(status_code=404, detail="Workout not found")
+    for field, value in workout_update.dict(exclude_unset=True).items():
+        setattr(workout, field, value)
+    db.commit()
+    db.refresh(workout)
+    return workout
+
+
+# DELETE
+@app.delete("/workouts/{workout_id}")
+def delete_workout(
+    workout_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(dependencies.get_current_user),
+):
+    workout = (
+        db.query(models.Workout)
+        .filter(
+            models.Workout.id == workout_id, models.Workout.user_id == current_user.id
+        )
+        .first()
+    )
+    if not workout:
+        raise HTTPException(status_code=404, detail="Workout not found")
+    db.delete(workout)
+    db.commit()
+    return {"message": "Workout deleted"}
