@@ -83,7 +83,7 @@ def create_workout(
     db: Session = Depends(database.get_db),
     current_user: models.User = Depends(dependencies.get_current_user),
 ):
-    new_workout = models.Workout(user_id=current_user.id, **workout.dict())
+    new_workout = models.Workout(user_id=current_user.id, **workout.model_dump())
     db.add(new_workout)
     db.commit()
     db.refresh(new_workout)
@@ -137,7 +137,7 @@ def update_workout(
     )
     if not workout:
         raise HTTPException(status_code=404, detail="Workout not found")
-    for field, value in workout_update.dict(exclude_unset=True).items():
+    for field, value in workout_update.model_dump(exclude_unset=True).items():
         setattr(workout, field, value)
     db.commit()
     db.refresh(workout)
