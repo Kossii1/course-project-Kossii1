@@ -1,4 +1,6 @@
-from fastapi import Depends, HTTPException
+import time
+
+from fastapi import Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
@@ -18,3 +20,26 @@ def get_current_user(
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
     return user
+
+
+RATE_LIMIT = {}
+LIMIT = 5
+PERIOD = 600
+
+
+def rate_limit_register(request: Request):
+    ip = request.client.host
+    now = time.time()
+
+    attempts = RATE_LIMIT.get(ip, [])
+
+    attempts = [t for t in attempts if now - t < PERIOD]
+
+    if len(attempts) >= LIMIT:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many registration attempts. Please try again later.",
+        )
+
+    attempts.append(now)
+    RATE_LIMIT[ip] = attempts

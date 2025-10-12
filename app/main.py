@@ -42,7 +42,10 @@ models.Base.metadata.create_all(bind=database.engine)
 
 
 @app.post("/auth/register")
-def register(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
+def register(
+    user: schemas.UserCreate, request: Request, db: Session = Depends(database.get_db)
+):
+    dependencies.rate_limit_register(request)
     db_user = (
         db.query(models.User).filter(models.User.username == user.username).first()
     )
