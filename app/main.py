@@ -45,6 +45,7 @@ models.Base.metadata.create_all(bind=database.engine)
 def register(
     user: schemas.UserCreate, request: Request, db: Session = Depends(database.get_db)
 ):
+    dependencies.validate_request_origin(request)
     if not (user.captcha_token == "dev" or utils.verify_captcha(user.captcha_token)):
         raise HTTPException(status_code=400, detail="Invalid CAPTCHA")
     dependencies.rate_limit_register(request)

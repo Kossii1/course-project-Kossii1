@@ -43,3 +43,12 @@ def rate_limit_register(request: Request):
 
     attempts.append(now)
     RATE_LIMIT[ip] = attempts
+
+
+ALLOWED_ORIGINS = ["http://127.0.0.1:8000"]
+
+
+def validate_request_origin(request: Request):
+    origin = request.headers.get("origin") or request.headers.get("referer")
+    if not origin or not any(origin.startswith(allowed) for allowed in ALLOWED_ORIGINS):
+        raise HTTPException(status_code=400, detail="Invalid request origin")
