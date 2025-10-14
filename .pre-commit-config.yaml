@@ -11,7 +11,7 @@ repos:
       - id: no-commit-to-branch
         args: [ "--branch", "main", "--branch", "master" ]
         stages: [ commit, push ]
-        exclude: ^main$
+        exclude: ^main$|CI
   - repo: https://github.com/psf/black
     rev: 24.8.0
     hooks:
