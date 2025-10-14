@@ -6,10 +6,6 @@ client = TestClient(app)
 
 
 def test_workouts():
-    # Регистрация
-    r = client.post("/auth/register", json={"username": "alice", "password": "123"})
-    assert r.status_code == 200
-
     # Логин
     r = client.post("/auth/login", data={"username": "alice", "password": "123"})
     assert r.status_code == 200

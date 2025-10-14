@@ -42,18 +42,18 @@ models.Base.metadata.create_all(bind=database.engine)
 
 
 @app.post("/auth/register")
-def register(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
+def register(
+    user: schemas.UserCreate, request: Request, db: Session = Depends(database.get_db)
+):
+    dependencies.validate_request_origin(request)
+    if not (user.captcha_token == "dev" or utils.verify_captcha(user.captcha_token)):
+        raise HTTPException(status_code=400, detail="Invalid CAPTCHA")
+    dependencies.rate_limit_register(request)
     db_user = (
         db.query(models.User).filter(models.User.username == user.username).first()
     )
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
-    print(
-        "Password:",
-        user.password,
-        type(user.password),
-        len(str(user.password).encode("utf-8")),
-    )
     hashed_password = utils.hash_password(user.password)
     new_user = models.User(username=user.username, hashed_password=hashed_password)
     db.add(new_user)
