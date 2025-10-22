@@ -1,3 +1,4 @@
+import re
 import time
 
 from fastapi import Depends, HTTPException, Request
@@ -52,3 +53,22 @@ def validate_request_origin(request: Request):
     origin = request.headers.get("origin") or request.headers.get("referer")
     if not origin or not any(origin.startswith(allowed) for allowed in ALLOWED_ORIGINS):
         raise HTTPException(status_code=400, detail="Invalid request origin")
+
+
+def validate_password(password: str):
+    """Простая серверная валидация пароля. Бросает HTTPException с текстом ошибки."""
+    if password is None or password == "":
+        raise HTTPException(status_code=400, detail="Password cannot be empty")
+    if len(password) < 8:
+        raise HTTPException(
+            status_code=400, detail="Password must be at least 8 characters"
+        )
+    if not re.search(r"[A-Z]", password):
+        raise HTTPException(
+            status_code=400,
+            detail="Password must contain at least one uppercase letter",
+        )
+    if not re.search(r"[0-9]", password):
+        raise HTTPException(
+            status_code=400, detail="Password must contain at least one digit"
+        )

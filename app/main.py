@@ -75,6 +75,7 @@ def register(
     if not (user.captcha_token == "dev" or utils.verify_captcha(user.captcha_token)):
         raise HTTPException(status_code=400, detail="Invalid CAPTCHA")
     dependencies.rate_limit_register(request)
+    dependencies.validate_password(user.password)
     db_user = (
         db.query(models.User).filter(models.User.username == user.username).first()
     )
@@ -93,10 +94,11 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(database.get_db),
 ):
+    dependencies.validate_password(form_data.password)
     user = (
         db.query(models.User).filter(models.User.username == form_data.username).first()
     )
-    if not user or not utils.verify_password(form_data.password, user.hashed_password):
+    if not utils.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid username or password")
     access_token = auth.create_access_token({"sub": str(user.id)})
     return {"access_token": access_token, "token_type": "bearer"}
