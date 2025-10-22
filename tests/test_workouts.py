@@ -8,7 +8,9 @@ client = TestClient(app)
 
 def test_workouts():
     # Логин
-    r = client.post("/auth/login", data={"username": "alice", "password": "123"})
+    r = client.post(
+        "/auth/login", data={"username": "alice", "password": "Password123"}
+    )
     assert r.status_code == 200
     token = r.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}

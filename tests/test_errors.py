@@ -9,7 +9,11 @@ client = TestClient(app)
 def test_invalid_captcha_rfc7807():
     response = client.post(
         "/auth/register",
-        json={"username": "user123", "password": "pass", "captcha_token": "wrong"},
+        json={
+            "username": "user123",
+            "password": "Password123",
+            "captcha_token": "wrong",
+        },
         headers={"origin": "http://127.0.0.1:8000"},
     )
     assert response.status_code == 400
@@ -21,7 +25,7 @@ def test_invalid_captcha_rfc7807():
 def test_invalid_origin_rfc7807():
     response = client.post(
         "/auth/register",
-        json={"username": "user123", "password": "pass", "captcha_token": "dev"},
+        json={"username": "user123", "password": "Password123", "captcha_token": "dev"},
         headers={"origin": "http://malicious.com"},
     )
     assert response.status_code == 400
@@ -33,7 +37,7 @@ def test_invalid_origin_rfc7807():
 def test_invalid_login_rfc7807():
     response = client.post(
         "/auth/login",
-        data={"username": "nonexistent", "password": "wrong"},
+        data={"username": "nonexistent", "password": "Wrong1234"},
     )
     assert response.status_code == 401
     data = response.json()
@@ -43,7 +47,9 @@ def test_invalid_login_rfc7807():
 
 def test_workout_not_found_rfc7807():
     # Нужно логиниться для авторизации
-    r = client.post("/auth/login", data={"username": "alice", "password": "123"})
+    r = client.post(
+        "/auth/login", data={"username": "alice", "password": "Password123"}
+    )
     token = r.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 

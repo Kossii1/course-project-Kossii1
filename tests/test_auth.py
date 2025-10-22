@@ -22,7 +22,7 @@ def test_successful_registration():
     """Проверка успешной регистрации"""
     response = client.post(
         "/auth/register",
-        json={"username": "alice", "password": "123", "captcha_token": "dev"},
+        json={"username": "alice", "password": "Password123", "captcha_token": "dev"},
         headers={"origin": "http://127.0.0.1:8000"},
     )
     assert response.status_code == 200
@@ -35,7 +35,11 @@ def test_rate_limit_registration():
     for i in range(5):
         r = client.post(
             "/auth/register",
-            json={"username": f"user{i}", "password": "pass", "captcha_token": "dev"},
+            json={
+                "username": f"user{i}",
+                "password": "Password123",
+                "captcha_token": "dev",
+            },
             headers={"origin": "http://127.0.0.1:8000"},
         )
         assert r.status_code == 200
@@ -43,7 +47,11 @@ def test_rate_limit_registration():
     # 6-я регистрация должна вернуть 429
     r = client.post(
         "/auth/register",
-        json={"username": "overflow", "password": "pass", "captcha_token": "dev"},
+        json={
+            "username": "overflow",
+            "password": "Password123",
+            "captcha_token": "dev",
+        },
         headers={"origin": "http://127.0.0.1:8000"},
     )
     assert r.status_code == 429
@@ -56,7 +64,7 @@ def test_invalid_captcha():
     """Проверка отклонения при некорректном CAPTCHA токене"""
     response = client.post(
         "/auth/register",
-        json={"username": "bob", "password": "123", "captcha_token": "invalid"},
+        json={"username": "bob", "password": "Password123", "captcha_token": "invalid"},
         headers={"origin": "http://127.0.0.1:8000"},
     )
     assert response.status_code == 400
@@ -69,7 +77,7 @@ def test_invalid_origin():
     """Проверка отклонения при недопустимом origin"""
     response = client.post(
         "/auth/register",
-        json={"username": "charlie", "password": "123", "captcha_token": "dev"},
+        json={"username": "charlie", "password": "Password123", "captcha_token": "dev"},
         headers={"origin": "http://malicious.com"},
     )
     assert response.status_code == 400
