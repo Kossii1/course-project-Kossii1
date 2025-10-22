@@ -29,7 +29,6 @@
 
 ## Security impact
 - Устраняет риск R1.
-- Соответствует NFR-02, NFR-03.
 
 ## Rollout plan
 -  Реализация rate limiting и CAPTCHA на уровне контроллера регистрации.
@@ -38,7 +37,7 @@
 -  Полный rollout после успешных нагрузочных тестов.
 
 ## Links
-- NFR-02, NFR-03
-- Threat Model: R1
+- Threat Model: регистрация (R1–R7)
+- RISKS: R1
 - tests/test_auth.py
 - PR #p05-secure-coding

@@ -26,7 +26,6 @@
 
 ## Security impact
 - Устраняет риск R2.
-- Соответствует NFR-01, NFR-03.
 
 ## Rollout plan
 - Реализована валидация и проверка origin.
@@ -35,7 +34,7 @@
 - Полный rollout после QA проверки.
 
 ## Links
-- NFR-01, NFR-03
-- Threat Model: R2
+- Threat Model: регистрация (R1–R6), логин (L1–L7), CRUD тренировок (W1–W4)
+- RISKS: R2, R5
 - tests/test_auth.py
 - PR #p05-secure-coding
