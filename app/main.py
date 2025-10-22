@@ -1,3 +1,6 @@
+from typing import Any, Dict
+from uuid import uuid4
+
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -15,21 +18,44 @@ class ApiError(Exception):
         self.status = status
 
 
+def problem(
+    status: int,
+    title: str,
+    detail: str,
+    type_: str = "about:blank",
+    extras: Dict[str, Any] | None = None,
+):
+    cid = str(uuid4())
+    payload = {
+        "type": type_,
+        "title": title,
+        "status": status,
+        "detail": detail,
+        "correlation_id": cid,
+    }
+    if extras:
+        payload.update(extras)
+    return JSONResponse(payload, status_code=status)
+
+
 @app.exception_handler(ApiError)
 async def api_error_handler(request: Request, exc: ApiError):
-    return JSONResponse(
-        status_code=exc.status,
-        content={"error": {"code": exc.code, "message": exc.message}},
+    return problem(
+        status=exc.status,
+        title="API Error",
+        detail=exc.message,
+        extras={"code": exc.code},
     )
 
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    # Normalize FastAPI HTTPException into our error envelope
     detail = exc.detail if isinstance(exc.detail, str) else "http_error"
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"error": {"code": "http_error", "message": detail}},
+    return problem(
+        status=exc.status_code,
+        title="HTTP Error",
+        detail=detail,
+        extras={"code": "http_error"},
     )
 
 
