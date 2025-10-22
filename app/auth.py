@@ -3,7 +3,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Optional
 
 from dotenv import load_dotenv
-from jose import jwt
+from jose import JWTError, jwt
 
 load_dotenv(".env.example")
 
@@ -26,5 +26,5 @@ def decode_access_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
-    except jwt.PyJWTError:
+    except JWTError:
         return None

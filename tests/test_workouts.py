@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from tests.utils import assert_rfc7807_structure
 
 client = TestClient(app)
 
@@ -33,3 +34,16 @@ def test_workouts():
     # DELETE
     r = client.delete(f"/workouts/{workout_id}", headers=headers)
     assert r.status_code == 200
+
+    # Попытка получить workout чужого пользователя
+    headers_wrong = {"Authorization": "Bearer INVALID_TOKEN"}
+    r = client.get(f"/workouts/{workout_id}", headers=headers_wrong)
+    assert r.status_code == 401
+    data = r.json()
+    assert_rfc7807_structure(data)
+
+    # Попытка обновить несуществующий workout
+    r = client.patch("/workouts/999999", json={"note": "Test"}, headers=headers)
+    assert r.status_code == 404
+    data = r.json()
+    assert_rfc7807_structure(data)

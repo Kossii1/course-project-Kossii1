@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 
 from app import dependencies
 from app.main import app
+from tests.utils import assert_rfc7807_structure
 
 # Клиент FastAPI
 client = TestClient(app)
@@ -46,8 +47,9 @@ def test_rate_limit_registration():
         headers={"origin": "http://127.0.0.1:8000"},
     )
     assert r.status_code == 429
-    resp_json = r.json()
-    assert "Too many registration attempts" in resp_json["error"]["message"]
+    data = r.json()
+    assert_rfc7807_structure(data)
+    assert "Too many registration attempts" in data["detail"]
 
 
 def test_invalid_captcha():
@@ -58,7 +60,9 @@ def test_invalid_captcha():
         headers={"origin": "http://127.0.0.1:8000"},
     )
     assert response.status_code == 400
-    assert response.json()["error"]["message"] == "Invalid CAPTCHA"
+    data = response.json()
+    assert_rfc7807_structure(data)
+    assert "Invalid CAPTCHA" in data["detail"]
 
 
 def test_invalid_origin():
@@ -69,4 +73,6 @@ def test_invalid_origin():
         headers={"origin": "http://malicious.com"},
     )
     assert response.status_code == 400
-    assert response.json()["error"]["message"] == "Invalid request origin"
+    data = response.json()
+    assert_rfc7807_structure(data)
+    assert "Invalid request origin" in data["detail"]
