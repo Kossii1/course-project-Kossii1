@@ -41,3 +41,4 @@
 - RISKS: R1
 - tests/test_auth.py
 - PR #p05-secure-coding
+- NFR: NFR-03
