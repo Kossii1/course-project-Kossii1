@@ -44,3 +44,4 @@
 - RISKS: R3, R6
 - tests/test_errors.py
 - PR #p05-secure-coding
+- NFR: NFR-02
