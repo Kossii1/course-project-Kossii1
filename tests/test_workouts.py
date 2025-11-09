@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 
+from app import dependencies
 from app.main import app
 from tests.utils import assert_rfc7807_structure
 
@@ -8,6 +9,7 @@ client = TestClient(app)
 
 def test_workouts():
     # Логин
+    dependencies.LOGIN_RATE_LIMIT.clear()
     r = client.post(
         "/auth/login", data={"username": "alice", "password": "Password123"}
     )

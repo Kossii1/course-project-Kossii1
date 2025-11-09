@@ -101,9 +101,11 @@ def register(
 
 @app.post("/auth/login", response_model=schemas.Token)
 def login(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(database.get_db),
 ):
+    dependencies.rate_limit_login(request)
     dependencies.validate_password(form_data.password)
     user = (
         db.query(models.User).filter(models.User.username == form_data.username).first()
