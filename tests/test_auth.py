@@ -101,3 +101,13 @@ def test_login_rate_limit_blocks_bruteforce():
     )
     assert r.status_code == 429
     assert "Too many login attempts. Please try again later." in r.json()["detail"]
+
+
+def test_login_sql_injection_attempt():
+    r = client.post(
+        "/auth/login", data={"username": "admin'--", "password": "Password123"}
+    )
+    assert r.status_code == 401
+    data = r.json()
+    assert_rfc7807_structure(data)
+    assert "Invalid username or password" in data["detail"]
