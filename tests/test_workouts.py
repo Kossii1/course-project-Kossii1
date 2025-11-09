@@ -49,3 +49,11 @@ def test_workouts():
     assert r.status_code == 404
     data = r.json()
     assert_rfc7807_structure(data)
+
+    r = client.get(f"/workouts/{workout_id}", headers=headers)
+    headers = r.headers
+
+    assert headers.get("X-Content-Type-Options") == "nosniff"
+    assert headers.get("X-Frame-Options") == "DENY"
+    assert "default-src" in headers.get("Content-Security-Policy", "")
+    assert headers.get("Referrer-Policy") == "no-referrer"

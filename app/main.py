@@ -59,6 +59,16 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     )
 
 
+@app.middleware("http")
+async def security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Content-Security-Policy"] = "default-src 'self'"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    return response
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
