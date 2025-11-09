@@ -31,8 +31,8 @@ jobs:
           black --check .
           isort --check-only .
 
-      - name: Tests
-        run: pytest -q
+      - name: Tests + Coverage
+        run: pytest --maxfail=1 --disable-warnings --cov=.
 
       - name: Pre-commit (all files)
         run: pre-commit run --all-files

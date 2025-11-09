@@ -13,8 +13,10 @@ client = TestClient(app)
 @pytest.fixture(autouse=True)
 def clear_rate_limit():
     dependencies.RATE_LIMIT.clear()
+    dependencies.LOGIN_RATE_LIMIT.clear()
     yield
     dependencies.RATE_LIMIT.clear()
+    dependencies.LOGIN_RATE_LIMIT.clear()
 
 
 # === Тесты для регистрации ===
@@ -84,3 +86,28 @@ def test_invalid_origin():
     data = response.json()
     assert_rfc7807_structure(data)
     assert "Invalid request origin" in data["detail"]
+
+
+def test_login_rate_limit_blocks_bruteforce():
+    for i in range(5):
+        r = client.post(
+            "/auth/login", data={"username": "alice", "password": "WrongPass123"}
+        )
+        assert r.status_code in (401, 400)
+
+    # 6-я попытка должна быть заблокирована
+    r = client.post(
+        "/auth/login", data={"username": "alice", "password": "WrongPass123"}
+    )
+    assert r.status_code == 429
+    assert "Too many login attempts. Please try again later." in r.json()["detail"]
+
+
+def test_login_sql_injection_attempt():
+    r = client.post(
+        "/auth/login", data={"username": "admin'--", "password": "Password123"}
+    )
+    assert r.status_code == 401
+    data = r.json()
+    assert_rfc7807_structure(data)
+    assert "Invalid username or password" in data["detail"]

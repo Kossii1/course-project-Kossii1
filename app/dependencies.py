@@ -46,6 +46,28 @@ def rate_limit_register(request: Request):
     RATE_LIMIT[ip] = attempts
 
 
+LOGIN_RATE_LIMIT = {}
+
+
+def rate_limit_login(request: Request):
+    ip = request.client.host
+    login_period = 60
+    login_limit = 5
+    now = time.time()
+
+    attempts = LOGIN_RATE_LIMIT.get(ip, [])
+    # оставляем только попытки в пределах окна
+    attempts = [t for t in attempts if now - t < login_period]
+
+    if len(attempts) >= login_limit:
+        raise HTTPException(
+            status_code=429, detail="Too many login attempts. Please try again later."
+        )
+
+    attempts.append(now)
+    LOGIN_RATE_LIMIT[ip] = attempts
+
+
 ALLOWED_ORIGINS = ["http://127.0.0.1:8000"]
 
 
