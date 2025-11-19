@@ -38,9 +38,16 @@ jobs:
 
       - name: Lint & Format
         run: |
-          ruff check . --output-format github
-          black --check .
-          isort --check-only .
+          ruff check . --output-format github | tee lint.log
+          black --check . | tee -a lint.log
+          isort --check-only . | tee -a lint.log
+
+
+      - name: Upload lint log
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-log
+          path: lint.log
 
   tests:
     runs-on: ${{ matrix.os }}
@@ -70,13 +77,26 @@ jobs:
           pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Tests + Coverage
-        run: pytest --maxfail=1 --disable-warnings --cov=.
+        run: |
+          pytest --maxfail=1 --disable-warnings --cov=. --cov-report=html:coverage_html | tee test.log
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           ALGORITHM: ${{ secrets.ALGORITHM }}
           RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY }}
           ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
+
+      - name: Upload test log
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-log
+          path: test.log
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: coverage_html/
 
       - name: Pre-commit (all files)
         run: pre-commit run --all-files
