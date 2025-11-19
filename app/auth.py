@@ -5,7 +5,7 @@ from typing import Optional
 from dotenv import load_dotenv
 from jose import JWTError, jwt
 
-load_dotenv(".env.example")
+load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
