@@ -44,6 +44,7 @@ jobs:
 
   tests:
     runs-on: ${{ matrix.os }}
+    environment: tests
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -70,6 +71,12 @@ jobs:
 
       - name: Tests + Coverage
         run: pytest --maxfail=1 --disable-warnings --cov=.
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ALGORITHM: ${{ secrets.ALGORITHM }}
+          RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY }}
+          ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
 
       - name: Pre-commit (all files)
         run: pre-commit run --all-files
