@@ -12,6 +12,7 @@ concurrency:
 jobs:
   lint:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -51,6 +52,7 @@ jobs:
 
   tests:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     environment: tests
     strategy:
       matrix:
