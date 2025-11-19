@@ -43,11 +43,10 @@ jobs:
           black --check . | tee -a lint.log
           isort --check-only . | tee -a lint.log
 
-
       - name: Upload lint log
         uses: actions/upload-artifact@v4
         with:
-          name: lint-log
+          name: lint-log-${{ matrix.os }}-${{ matrix.python-version }}
           path: lint.log
 
   tests:
@@ -91,13 +90,13 @@ jobs:
       - name: Upload test log
         uses: actions/upload-artifact@v4
         with:
-          name: test-log
+          name: test-log-${{ matrix.os }}-${{ matrix.python-version }}
           path: test.log
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-html
+          name: coverage-html-${{ matrix.os }}-${{ matrix.python-version }}
           path: coverage_html/
 
       - name: Pre-commit (all files)
