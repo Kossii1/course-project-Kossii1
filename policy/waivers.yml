@@ -1,0 +1,13 @@
+waivers:
+  - id: W-001
+    package: python-multipart
+    current_version: "0.0.6"
+    fixed_version: "0.0.18"
+    cve:
+      - CVE-2024-24762
+      - CVE-2024-53981
+    reason: "High уязвимости закрыты обновлением зависимости. Реальный фикс применён в requirements.txt."
+    status: "fixed"
+    reference: "https://github.com/Kossii1/course-project-Kossii1/commit/97ecb4a7b84b036d2b7223565a93022bfed15fb6"
+    reviewer: "@Kossii1"
+    notes: "SCA отчёты CI показывают отсутствие уязвимостей после обновления."
