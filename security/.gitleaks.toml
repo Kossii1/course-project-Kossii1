@@ -1,6 +1,7 @@
 title = "SecDev course gitleaks config"
 
 [extend]
+useDefault = true
 # Используем встроенные правила по умолчанию
 
 [allowlist]

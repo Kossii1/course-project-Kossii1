@@ -11,7 +11,7 @@ from app import auth, database, dependencies, models, schemas, utils
 app = FastAPI(title="SecDev Course App", version="0.1.0")
 
 # Заглушка для Gitleaks allowlist
-TEST_SECRET = "TEST_SECRET_DO_NOT_USE"
+AWS_SECRET_KEY = "AKIA1234567890ABCDEF"
 
 
 class ApiError(Exception):
