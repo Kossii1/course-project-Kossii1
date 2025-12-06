@@ -1,0 +1,15 @@
+title = "SecDev course gitleaks config"
+
+[extend]
+# Используем встроенные правила по умолчанию
+
+[allowlist]
+description = "ignore non-sensitive patterns and test tokens"
+paths = [
+  "EVIDENCE/",
+  "security/",
+]
+commits = []
+regexes = [
+  '''TEST_SECRET_DO_NOT_USE''',  # пример
+]
