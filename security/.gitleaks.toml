@@ -12,4 +12,5 @@ paths = [
 ]
 commits = []
 regexes = [
+  '''AKIA1234567890ABCDEF'''
 ]
