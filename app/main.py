@@ -10,6 +10,9 @@ from app import auth, database, dependencies, models, schemas, utils
 
 app = FastAPI(title="SecDev Course App", version="0.1.0")
 
+# Заглушка для Gitleaks allowlist
+AWS_SECRET_KEY = "AKIA1234567890ABCDEF"
+
 
 class ApiError(Exception):
     def __init__(self, code: str, message: str, status: int = 400):

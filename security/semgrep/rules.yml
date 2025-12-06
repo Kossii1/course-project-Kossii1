@@ -1,0 +1,34 @@
+rules:
+  - id: py-hardcoded-secret
+    languages: [python]
+    message: "Hardcoded secret ключи в коде обнаружены. Используйте env переменные."
+    severity: ERROR
+    patterns:
+      - pattern: |
+          SECRET_KEY = "...$X..."
+      - pattern-not: |
+          SECRET_KEY = os.getenv("SECRET_KEY")
+    metadata:
+      category: security
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+
+  - id: py-argon2-hash
+    languages: [python]
+    message: "Убедитесь, что хеширование паролей использует Argon2 (pwd_context)."
+    severity: INFO
+    patterns:
+      - pattern: |
+          pwd_context.hash($PASSWORD)
+      - pattern-not: |
+          pwd_context.hash($PASSWORD, scheme="bcrypt")
+    metadata:
+      category: security
+      cwe: "CWE-326: Inadequate Encryption Strength"
+
+  - id: py-sqlalchemy-raw-sql
+    languages: [python]
+    message: "Использование raw SQL с динамическими строками может быть опасно."
+    severity: WARNING
+    patterns:
+      - pattern: |
+          db.execute("SELECT * FROM ...$X...")
