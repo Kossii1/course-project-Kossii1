@@ -11,5 +11,4 @@ paths = [
 ]
 commits = []
 regexes = [
-  '''TEST_SECRET_DO_NOT_USE''',  # пример
 ]
